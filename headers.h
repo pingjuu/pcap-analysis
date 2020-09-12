@@ -1,4 +1,7 @@
 #include <stdint.h>
+#include <iostream>
+#include <cstdint>
+#include <string>
 #ifndef HEADERS_H
 #define HEADERS_H
 
@@ -6,7 +9,7 @@
 
 
 #define ETHER_ADDR_LEN 6
-#define ETHERTYPE_IP 0x0800  /* IP protocol */
+#define ETHERTYPE_IP 0x0800  // IP protocol 
 
 typedef uint8_t u_int8_t;
 typedef uint16_t u_int16_t;
@@ -17,23 +20,23 @@ typedef uint32_t in_addr_t;
 struct in_addr
 {
     uint32_t s_addr;
-};
-*/
-struct libnet_ethernet_hdr
+};*/
+
+struct ethernet_hdr
 {
-    u_int8_t  ether_dhost[ETHER_ADDR_LEN];/* destination ethernet address */
-    u_int8_t  ether_shost[ETHER_ADDR_LEN];/* source ethernet address */
-    u_int16_t ether_type;                 /* protocol */
+    u_int8_t  ether_dhost[ETHER_ADDR_LEN];// destination ethernet address 
+    u_int8_t  ether_shost[ETHER_ADDR_LEN];// source ethernet address 
+    u_int16_t ether_type;                 // protocol 
 };
 
 
 
-struct libnet_ipv4_hdr
+struct ipv4_hdr
 {
-    u_int8_t ip_hl:4,       /* version */
-            ip_v:4;        /* header length */
+    u_int8_t ip_hl:4,       // version 
+            ip_v:4;        // header length 
 
-    u_int8_t ip_tos;       /* type of service */
+    u_int8_t ip_tos;       // type of service 
 #ifndef IPTOS_LOWDELAY
 #define IPTOS_LOWDELAY      0x10
 #endif
@@ -46,57 +49,58 @@ struct libnet_ipv4_hdr
 #ifndef IPTOS_LOWCOST
 #define IPTOS_LOWCOST       0x02
 #endif
-    u_int16_t ip_len;         /* total length */
-    u_int16_t ip_id;          /* identification */
+    u_int16_t ip_len;         // total length 
+    u_int16_t ip_id;          // identification 
     u_int16_t ip_off;
 #ifndef IP_RF
-#define IP_RF 0x8000        /* reserved fragment flag */
+#define IP_RF 0x8000        // reserved fragment flag 
 #endif
 #ifndef IP_DF
-#define IP_DF 0x4000        /* dont fragment flag */
+#define IP_DF 0x4000        // dont fragment flag 
 #endif
 #ifndef IP_MF
-#define IP_MF 0x2000        /* more fragments flag */
+#define IP_MF 0x2000        // more fragments flag 
 #endif
 #ifndef IP_OFFMASK
-#define IP_OFFMASK 0x1fff   /* mask for fragmenting bits */
+#define IP_OFFMASK 0x1fff   // mask for fragmenting bits 
 #endif
-    u_int8_t ip_ttl;          /* time to live */
-    u_int8_t ip_p;            /* protocol */
-    u_int16_t ip_sum;         /* checksum */
-    in_addr ip_src, ip_dst; /* source and dest address */
+    u_int8_t ip_ttl;          // time to live 
+    u_int8_t ip_p;            // protocol 
+    u_int16_t ip_sum;         // checksum 
+    u_int32_t ip_src, ip_dst; // source and dest address 
 };
 
 #define P_TCP 0x06
 #define P_UDP 0x11
-struct libnet_tcp_hdr
+/*
+struct tcp_hdr
 {
-    u_int16_t th_sport;       /* source port */
-    u_int16_t th_dport;       /* destination port */
-    u_int32_t th_seq;          /* sequence number */
-    u_int32_t th_ack;          /* acknowledgement number */
+    u_int16_t th_sport;       // source port 
+    u_int16_t th_dport;       // destination port 
+    u_int32_t th_seq;          // sequence number 
+    u_int32_t th_ack;          // acknowledgement number 
 
-    u_int8_t th_x2:4,         /* (unused) */
-           th_off:4;        /* data offset */
+    u_int8_t th_x2:4,         // (unused) 
+           th_off:4;        // data offset 
 
-    u_int8_t  th_flags;       /* control flags */
+    u_int8_t  th_flags;       // control flags 
 #ifndef TH_FIN
-#define TH_FIN    0x01      /* finished send data */
+#define TH_FIN    0x01      // finished send data 
 #endif
 #ifndef TH_SYN
-#define TH_SYN    0x02      /* synchronize sequence numbers */
+#define TH_SYN    0x02      // synchronize sequence numbers 
 #endif
 #ifndef TH_RST
-#define TH_RST    0x04      /* reset the connection */
+#define TH_RST    0x04      // reset the connection 
 #endif
 #ifndef TH_PUSH
-#define TH_PUSH   0x08      /* push data to the app layer */
+#define TH_PUSH   0x08      // push data to the app layer 
 #endif
 #ifndef TH_ACK
-#define TH_ACK    0x10      /* acknowledge */
+#define TH_ACK    0x10      // acknowledge 
 #endif
 #ifndef TH_URG
-#define TH_URG    0x20      /* urgent! */
+#define TH_URG    0x20      // urgent! 
 #endif
 #ifndef TH_ECE
 #define TH_ECE    0x40
@@ -104,15 +108,74 @@ struct libnet_tcp_hdr
 #ifndef TH_CWR
 #define TH_CWR    0x80
 #endif
-    u_int16_t th_win;         /* window */
-    u_int16_t th_sum;         /* checksum */
-    u_int16_t th_urp;         /* urgent pointer */
+    u_int16_t th_win;         // window 
+    u_int16_t th_sum;         // checksum 
+    u_int16_t th_urp;         // urgent pointer 
 };
 
- struct libnet_udp_hdr
+ struct udp_hdr
  {
-     uint16_t uh_sport;       /* source port */
-     uint16_t uh_dport;       /* destination port */
-     uint16_t uh_ulen;        /* length */
-     uint16_t uh_sum;         /* checksum */
+     uint16_t uh_sport;       // source port 
+     uint16_t uh_dport;       // destination port 
+     uint16_t uh_ulen;        // length 
+     uint16_t uh_sum;         // checksum 
  };
+ */
+struct tcp_hdr
+{
+    u_int16_t sport;       //source port 
+    u_int16_t dport;       // destination port
+    u_int32_t th_seq;          // sequence number 
+    u_int32_t th_ack;          // acknowledgement number 
+
+    u_int8_t th_x2:4,         // (unused) 
+           th_off:4;        // data offset 
+
+    u_int8_t  th_flags;       // control flags 
+#ifndef TH_FIN
+#define TH_FIN    0x01      // finished send data 
+#endif
+#ifndef TH_SYN
+#define TH_SYN    0x02      // synchronize sequence numbers 
+#endif
+#ifndef TH_RST
+#define TH_RST    0x04      // reset the connection
+#endif
+#ifndef TH_PUSH
+#define TH_PUSH   0x08      // push data to the app layer 
+#endif
+#ifndef TH_ACK
+#define TH_ACK    0x10      // acknowledge 
+#endif
+#ifndef TH_URG
+#define TH_URG    0x20      // urgent! 
+#endif
+#ifndef TH_ECE
+#define TH_ECE    0x40
+#endif
+#ifndef TH_CWR
+#define TH_CWR    0x80
+#endif
+    u_int16_t th_win;         // window 
+    u_int16_t th_sum;         // checksum
+    u_int16_t th_urp;         // urgent pointer 
+};
+
+ struct udp_hdr
+ {
+     uint16_t sport;       // source port 
+     uint16_t dport;       // destination port 
+     uint16_t uh_ulen;        // length 
+     uint16_t uh_sum;         // checksum 
+ };
+
+std::string ipp(uint32_t address){
+    char buf[32]; // enough size
+	sprintf(buf, "%u.%u.%u.%u",
+		(address & 0x000000FF),
+        (address & 0x0000FF00) >> 8,
+        (address & 0x00FF0000) >> 16,
+        (address & 0xFF000000) >> 24);
+	return std::string(buf);
+}
+

@@ -1,7 +1,10 @@
 all: pcap_analysis
 
-pcap_analysis: pcap_analysis.o
-	g++ -o pcap_analysis pcap_analysis.o -lpcap
+pcap_analysis: main.o
+	g++ -o pcap_analysis main.o -lpcap
 
-pcap_analysis.o: pcap.cpp link.h headers.h
-	g++ -c -o pcap_analysis.o pcap.cpp -lpcap
+main.o: main.cpp flow.h headers.h
+	g++ -c -o main.o main.cpp -lpcap
+
+clean:
+	rm -f pcap_analysis *.o
