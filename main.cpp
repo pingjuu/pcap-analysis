@@ -5,16 +5,19 @@
 #include "headers.h"
 #include "flow.h"
 
+extern std::unordered_map<int, flow_Content*> tcpmap;
+extern std::unordered_map<int, flow_Content*> udpmap;
+extern std::unordered_map<flow_Content*, std::array<int,4>> session; 
+int ToCompare(std::unordered_map<int, flow_Content*> *map);
+void Print_Conversation(std::unordered_map<int, flow_Content*> *map);
+void TCPsession(std::unordered_map<int, flow_Content*> *map, int i, int j);
+void reverseTCPsession(std::unordered_map<int, flow_Content*> *map, int i, int j);
+
 void usage() {
     printf("syntax: pcap-test <packetfile.pcap>\n");
     printf("sample: pcap-test gilgil.pcap\n");
 }
 
-extern std::unordered_map<int, flow_Content*> tcpmap;
-extern std::unordered_map<int, flow_Content*> udpmap;
-
-int ToCompare(std::unordered_map<int, flow_Content*> *map);
-void Print_Conversation(std::unordered_map<int, flow_Content*> *map);
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         usage();
@@ -75,13 +78,15 @@ int ToCompare(std::unordered_map<int, flow_Content*> *map) {
     flow_Content *temp;
     int mapsize = (*map).size();
 
-   for(int i=1; i<mapsize+1; i++){
-        if((*map)[i]==0) {std::cout<<"i mapout\n"; continue;}
+    for(int i=1; i<mapsize+1; i++){
+        if((*map)[i]==0) continue;
         for(int j=i+1; j <= mapsize+1; j++){
-            if((*map)[j]==0) {std::cout<<"j mapout\n"; continue;}
+            if((*map)[j]==0)  continue;
             if((*map)[i]->operator<((*map)[j])){
                 (*map)[i]->PacketNumPlus();
                 (*map)[i]->AddBytes((*map)[j]);
+                if(map == &tcpmap)
+                    TCPsession(map, i, j);
                 temp=(*map)[j];
                 (*map).erase(j);
                 delete temp;
@@ -89,12 +94,38 @@ int ToCompare(std::unordered_map<int, flow_Content*> *map) {
             else if((*map)[i]->operator!=((*map)[j])){ //역방향 비교  true이면 역방향이다.
                 (*map)[i]->rPacketNumPlus();
                 (*map)[i]->rAddBytes((*map)[j]);
+                if(map == &tcpmap)
+                    reverseTCPsession(map, i, j);
                 temp=(*map)[j];
                 (*map).erase(j);
                 delete temp;
             }
         }
    }
+    for(int i=1; i<mapsize+1; i++){
+        if((*map)[i]==0)continue;
+        if((session[(*map)[i]][1]==TH_FIN)&&(session[(*map)[i]][2]==TH_ACK)&&(session[(*map)[i]][3]==TH_FIN)&&(session[(*map)[i]][4]==TH_ACK)){
+            temp=(*map)[i];
+            (*map).erase(i);
+            delete temp;
+        }
+
+    }
+
+}
+
+void TCPsession(std::unordered_map<int, flow_Content*> *map, int i, int j){
+    if((*map)[j]->_th_flags()==TH_FIN)
+        session[(*map)[i]][1]=TH_FIN;
+    else if((*map)[j]->_th_flags()==TH_ACK)
+        session[(*map)[i]][2]=TH_FIN;
+}
+
+void reverseTCPsession(std::unordered_map<int, flow_Content*> *map, int i, int j){
+    if((*map)[j]->_th_flags()==TH_FIN)
+        session[(*map)[i]][3]=TH_FIN;
+    else if((*map)[j]->_th_flags()==TH_ACK)
+        session[(*map)[i]][4]=TH_FIN;
 }
 
 void Print_Conversation(std::unordered_map<int, flow_Content*> *map){

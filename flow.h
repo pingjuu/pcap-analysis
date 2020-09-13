@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <array>
 #include <pcap.h>
 #include <string>
 
@@ -17,15 +18,17 @@ private:
     bpf_u_int32 bytes;
     unsigned int rPacket;       //역방향
     bpf_u_int32 rbytes;
+    u_int8_t  th_flags;
 public:
     flow_Content(){
         Packet = 0;
         bytes = 0;
         rPacket = 0;
         rbytes = 0;
+        th_flags=0;
     };
     ~flow_Content(){};
-    void flowinsert(u_int32_t _addressA, u_int16_t _PortA, u_int32_t _addressB, u_int16_t _PortB, bpf_u_int32 _bytes);
+    void flowinsert(u_int32_t _addressA, u_int16_t _PortA, u_int32_t _addressB, u_int16_t _PortB, bpf_u_int32 _bytes, u_int8_t  th_flags);
     void PacketNumPlus(){
         Packet++;
     };
@@ -48,15 +51,18 @@ public:
     bpf_u_int32 _bytes(){return bytes;}
     unsigned int _rPacket(){return rPacket;}         //역방향
     bpf_u_int32 _rbytes(){return rbytes;}
+    u_int8_t  _th_flags(){return th_flags;}
 };
 
-void flow_Content::flowinsert(u_int32_t _addressA, u_int16_t _PortA, u_int32_t _addressB, u_int16_t _PortB, bpf_u_int32 _bytes){
+void flow_Content::flowinsert(u_int32_t _addressA, u_int16_t _PortA, u_int32_t _addressB, u_int16_t _PortB, bpf_u_int32 _bytes, u_int8_t  _th_flags){
     addressA=_addressA;
     PortA=_PortA;
     addressB=_addressB;
     PortB=_PortB;
     Packet ++;
     bytes += _bytes;
+    if(_th_flags!=0)
+        th_flags = _th_flags;
 }
 
 bool flow_Content::operator<(const flow_Content* flow) const{
@@ -70,8 +76,11 @@ bool flow_Content::operator!=(const flow_Content* flow) const{
         return true;
     else return false;
 }
+
 std::unordered_map<int, flow_Content*> tcpmap;
 std::unordered_map<int, flow_Content*> udpmap;
+std::array<int,4> tcpflag = {0,0,0,0};
+std::unordered_map<flow_Content*, std::array<int,4>> session; 
 
 void flow(const u_char* packet, struct pcap_pkthdr* header);
 flow_Content* insert(const u_char* packet, struct pcap_pkthdr* header);
@@ -93,11 +102,11 @@ flow_Content* insert(const u_char* packet, struct pcap_pkthdr* header){  //packe
     //flow에 받아온 패킷의 ip와 port 삽입
     if(ipPacket->ip_p == P_TCP){
         struct tcp_hdr *Packet = (struct tcp_hdr *)(packet + 14 + (ipPacket->ip_hl<<2));
-        f->flowinsert(ipPacket->ip_src, Packet->sport, ipPacket->ip_dst, Packet->dport, header->caplen);
+        f->flowinsert(ipPacket->ip_src, Packet->sport, ipPacket->ip_dst, Packet->dport, header->caplen, Packet->th_flags);
     }
     else{
         struct udp_hdr *Packet = (struct udp_hdr *)(packet + 14 + (ipPacket->ip_hl<<2));
-        f->flowinsert(ipPacket->ip_src, Packet->sport, ipPacket->ip_dst, Packet->dport, header->caplen);
+        f->flowinsert(ipPacket->ip_src, Packet->sport, ipPacket->ip_dst, Packet->dport, header->caplen, 0);
     }
     return f;   //flow 반환 
 }
