@@ -27,6 +27,7 @@ u_int32_t flowInfo::_addressA(){return addressA;}
 u_int16_t flowInfo::_PortA(){return PortA;}
 u_int32_t flowInfo::_addressB(){return addressB;}
 u_int16_t flowInfo::_PortB(){return PortB;}
+u_int8_t  flowInfo::_th_flags(){return th_flags;}
 bool flowInfo::operator<(const flowInfo flow) const{
     if(this->addressA != flow.addressA) return this->addressA < flow.addressA;
     if(this->PortA != flow.PortA) return this->PortA < flow.PortA;

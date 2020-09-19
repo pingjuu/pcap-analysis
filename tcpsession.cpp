@@ -1,8 +1,7 @@
 #include "tcpsession.h"
 
 std::array<int,2> tcpflag = {0,0};
-std::map<flowInfo, std::array<int,2>={0,0}> session; 
-std::map<flowInfo, std::array<int,4>> session; 
+std::map<flowInfo, std::array<int,2>> session; 
 
 void TCPsession(class flowInfo f){        //패킷의 tcp session 에 필요한 tcp flag 넣기
     if(f._th_flags()==TH_FIN)

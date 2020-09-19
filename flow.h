@@ -35,6 +35,7 @@ public:
     u_int16_t _PortA();
     u_int32_t _addressB();
     u_int16_t _PortB();
+    u_int8_t  _th_flags();
     bool operator<(const flowInfo flow) const;
 };
 /*bool flowInfo::operator==(const flowInfo flow) const{
