@@ -3,12 +3,13 @@
 #include <array>
 #include <pcap.h>
 #include <string>
-//#include <unordered_map>
-#include <map>
+#include <unordered_map>
+#include <arpa/inet.h>
+//#include <map>
 #include "headers.h"
 #include "tcpsession.h"
+#define FLOW_MAP std::unordered_map<flowInfo, flowContent, MyHashFunction>
 
-#define FLOW_MAP std::map<flowInfo, flowContent>
 
 //extern FLOW_MAP tcpmap;
 //extern FLOW_MAP udpmap;
@@ -17,6 +18,8 @@ typedef uint8_t u_int8_t;
 typedef uint16_t u_int16_t;
 typedef uint32_t u_int32_t;
 typedef uint64_t u_int64_t;
+
+
 
 class flowInfo{
 private:
@@ -33,14 +36,19 @@ public:
     flowInfo reverseflow();
     u_int32_t _addressA();
     u_int16_t _PortA();
+    u_int16_t _PortA() const;
     u_int32_t _addressB();
     u_int16_t _PortB();
     u_int8_t  _th_flags();
     bool operator<(const flowInfo flow) const;
+    bool operator==(const flowInfo flow) const;
 };
-/*bool flowInfo::operator==(const flowInfo flow) const{
-    return (this->addressA == flow.addressA)&&(this->PortA==flow.PortA)&&(this->addressB==flow.addressB)&&(this->PortB==flow.PortB);
-}*/
+
+class MyHashFunction{
+public:
+    uint operator()(const flowInfo f) const;
+};
+
 
 class flowContent{
 private:

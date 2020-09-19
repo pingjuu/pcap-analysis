@@ -25,6 +25,7 @@ flowInfo flowInfo::reverseflow(){
 }
 u_int32_t flowInfo::_addressA(){return addressA;}
 u_int16_t flowInfo::_PortA(){return PortA;}
+u_int16_t flowInfo::_PortA() const{return PortA;}
 u_int32_t flowInfo::_addressB(){return addressB;}
 u_int16_t flowInfo::_PortB(){return PortB;}
 u_int8_t  flowInfo::_th_flags(){return th_flags;}
@@ -33,6 +34,9 @@ bool flowInfo::operator<(const flowInfo flow) const{
     if(this->PortA != flow.PortA) return this->PortA < flow.PortA;
     if(this->addressB != flow.addressB) return this->addressB < flow.addressB;
     return this->PortB < flow.PortB;
+}
+bool flowInfo::operator==(const flowInfo flow) const{
+    return (this->addressA == flow.addressA)&&(this->PortA==flow.PortA)&&(this->addressB==flow.addressB)&&(this->PortB==flow.PortB);
 }
 flowContent::flowContent(){
     this->Packet = 0;
@@ -43,6 +47,11 @@ void flowContent::flowAdd(bpf_u_int32 bytes){
     this->Packet++;
     this-> bytes += bytes;
 };
+
+uint MyHashFunction::operator()(const flowInfo f) const{
+        return htons(f._PortA())%10;
+}
+
 unsigned int flowContent::_Packet(){return Packet;} 
 bpf_u_int32 flowContent::_bytes(){return bytes;}
 
@@ -81,7 +90,7 @@ void map_insert(const u_char* packet, struct pcap_pkthdr* header, FLOW_MAP *map)
     //flow안에 th_flag확인하기
     if(iter==map->end()){     //tcpmap 안에 같은 플로우가 존재하지 않으면 
         flowContent content;    //새로 value 값을 만들어서 map에 넣기
-        map->insert(std::pair<flowInfo, flowContent>(f, content));
+        map->insert(std::make_pair(f, content));
         iter=map->find(f);
     }
     //tcp 안에 같은 플로우가 존재하면, iter의 flow 더하기
