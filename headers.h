@@ -1,3 +1,4 @@
+#pragma once
 #include <stdint.h>
 #include <iostream>
 #include <cstdint>
@@ -15,12 +16,6 @@ typedef uint8_t u_int8_t;
 typedef uint16_t u_int16_t;
 typedef uint32_t u_int32_t;
 typedef uint64_t u_int64_t;
-/*
-typedef uint32_t in_addr_t;
-struct in_addr
-{
-    uint32_t s_addr;
-};*/
 
 struct ethernet_hdr
 {
@@ -72,55 +67,7 @@ struct ipv4_hdr
 
 #define P_TCP 0x06
 #define P_UDP 0x11
-/*
-struct tcp_hdr
-{
-    u_int16_t th_sport;       // source port 
-    u_int16_t th_dport;       // destination port 
-    u_int32_t th_seq;          // sequence number 
-    u_int32_t th_ack;          // acknowledgement number 
 
-    u_int8_t th_x2:4,         // (unused) 
-           th_off:4;        // data offset 
-
-    u_int8_t  th_flags;       // control flags 
-#ifndef TH_FIN
-#define TH_FIN    0x01      // finished send data 
-#endif
-#ifndef TH_SYN
-#define TH_SYN    0x02      // synchronize sequence numbers 
-#endif
-#ifndef TH_RST
-#define TH_RST    0x04      // reset the connection 
-#endif
-#ifndef TH_PUSH
-#define TH_PUSH   0x08      // push data to the app layer 
-#endif
-#ifndef TH_ACK
-#define TH_ACK    0x10      // acknowledge 
-#endif
-#ifndef TH_URG
-#define TH_URG    0x20      // urgent! 
-#endif
-#ifndef TH_ECE
-#define TH_ECE    0x40
-#endif
-#ifndef TH_CWR
-#define TH_CWR    0x80
-#endif
-    u_int16_t th_win;         // window 
-    u_int16_t th_sum;         // checksum 
-    u_int16_t th_urp;         // urgent pointer 
-};
-
- struct udp_hdr
- {
-     uint16_t uh_sport;       // source port 
-     uint16_t uh_dport;       // destination port 
-     uint16_t uh_ulen;        // length 
-     uint16_t uh_sum;         // checksum 
- };
- */
 struct tcp_hdr
 {
     u_int16_t sport;       //source port 
@@ -169,13 +116,5 @@ struct tcp_hdr
      uint16_t uh_sum;         // checksum 
  };
 
-std::string ipp(uint32_t address){
-    char buf[32]; // enough size
-	sprintf(buf, "%u.%u.%u.%u",
-		(address & 0x000000FF),
-        (address & 0x0000FF00) >> 8,
-        (address & 0x00FF0000) >> 16,
-        (address & 0xFF000000) >> 24);
-	return std::string(buf);
-}
+
 
